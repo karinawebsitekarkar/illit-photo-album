@@ -1,1 +1,242 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>illit ♡</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #fffafa;
+  color: #777;
+  font-family: Georgia, serif;
+  text-align: center;
+}
+
+header { padding: 35px 15px 15px; }
+
+h1 {
+  color: #d6aeba;
+  font-size: 42px;
+  margin: 0;
+  letter-spacing: 3px;
+}
+
+.subtitle {
+  color: #bba4ac;
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+
+.decor {
+  color: #d9c5cb;
+  letter-spacing: 8px;
+  margin: 15px;
+}
+
+.members {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  padding: 15px;
+}
+
+.members button, .controls button {
+  background: white;
+  color: #bd929f;
+  border: 1px solid #ead8de;
+  border-radius: 25px;
+  padding: 10px 17px;
+  font-family: Georgia, serif;
+  cursor: pointer;
+}
+
+.members button.active,
+.controls button:hover {
+  background: #f5e8ed;
+}
+
+.album {
+  width: min(90%, 440px);
+  margin: 20px auto;
+  padding: 18px;
+  background: white;
+  border: 1px solid #eadde1;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px #eadde155;
+}
+
+.album-title {
+  color: #c69eaa;
+  font-size: 23px;
+  margin: 5px 0 15px;
+}
+
+.photo-frame {
+  padding: 10px;
+  border: 1px solid #ead8de;
+  background: #fffafa;
+}
+
+.photo-frame img {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+.page-number {
+  color: #bba4ac;
+  font-size: 13px;
+  margin: 13px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 15px;
+}
+
+footer {
+  color: #c5aab3;
+  padding: 25px;
+  font-size: 13px;
+}
+
+#viewer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #000e;
+  z-index: 5;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+#viewer img {
+  max-width: 95%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+#viewer span {
+  position: absolute;
+  top: 18px;
+  right: 25px;
+  color: white;
+  font-size: 35px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>illit ♡</h1>
+  <div class="subtitle">a little photo collection</div>
+  <div class="decor">♡ ✧ ୨୧ ✧ ♡</div>
+</header>
+
+<nav class="members" id="members"></nav>
+
+<main class="album">
+  <div class="decor">˚₊‧꒰ა ♡ ໒꒱ ‧₊˚</div>
+  <div class="album-title" id="albumTitle">yunah ♡</div>
+  <div class="photo-frame">
+    <img id="photo" src="yunah/yunah%201.jpg" alt="album photo">
+  </div>
+  <div class="page-number" id="pageNumber">page 1 of 5</div>
+  <div class="controls">
+    <button id="previous">♡ previous</button>
+    <button id="next">next ♡</button>
+  </div>
+  <div class="decor">♡ · · · ♡ · · · ♡</div>
+</main>
+
+<footer>made with love ♡ for illit</footer>
+
+<div id="viewer">
+  <span id="closeViewer">×</span>
+  <img id="largePhoto" alt="enlarged album photo">
+</div>
+
+<script>
+const members = [
+  "yunah", "minju", "wonhee",
+  "moka", "iroha", "group"
+];
+
+let currentMember = "yunah";
+let currentPage = 1;
+const totalPages = 5;
+
+const nav = document.getElementById("members");
+const photo = document.getElementById("photo");
+
+function photoPath(member, page) {
+  return `${member}/${encodeURIComponent(member + " " + page + ".jpg")}`;
+}
+
+function showPhoto() {
+  photo.src = photoPath(currentMember, currentPage);
+  photo.alt = currentMember + " photo " + currentPage;
+  document.getElementById("albumTitle").textContent =
+    currentMember + " ♡";
+  document.getElementById("pageNumber").textContent =
+    `page ${currentPage} of ${totalPages}`;
+
+  document.querySelectorAll(".members button").forEach(button => {
+    button.classList.toggle(
+      "active", button.dataset.member === currentMember
+    );
+  });
+}
+
+members.forEach(member => {
+  const button = document.createElement("button");
+  button.textContent = member;
+  button.dataset.member = member;
+  button.addEventListener("click", () => {
+    currentMember = member;
+    currentPage = 1;
+    showPhoto();
+  });
+  nav.appendChild(button);
+});
+
+document.getElementById("previous").addEventListener("click", () => {
+  currentPage = currentPage === 1 ? totalPages : currentPage - 1;
+  showPhoto();
+});
+
+document.getElementById("next").addEventListener("click", () => {
+  currentPage = currentPage === totalPages ? 1 : currentPage + 1;
+  showPhoto();
+});
+
+photo.addEventListener("click", () => {
+  document.getElementById("largePhoto").src = photo.src;
+  document.getElementById("viewer").style.display = "flex";
+});
+
+document.getElementById("closeViewer").addEventListener("click", () => {
+  document.getElementById("viewer").style.display = "none";
+});
+
+document.getElementById("viewer").addEventListener("click", event => {
+  if (event.target.id === "viewer") {
+    event.currentTarget.style.display = "none";
+  }
+});
+
+showPhoto();
+</script>
+</body>
+</html>
