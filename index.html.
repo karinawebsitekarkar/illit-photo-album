@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>illit photo album ♡</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #fffafa;
+      color: #806b75;
+      font-family: Georgia, serif;
+      text-align: center;
+      padding: 25px 15px;
+    }
+
+    .pearls {
+      color: #d9bdca;
+      letter-spacing: 9px;
+      font-size: 19px;
+      margin: 12px;
+    }
+
+    h1 {
+      font-size: 35px;
+      font-weight: normal;
+      letter-spacing: 3px;
+      margin: 10px 0;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: #b69aa8;
+      margin-bottom: 25px;
+    }
+
+    .member-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+      max-width: 500px;
+      margin: 0 auto 25px;
+    }
+
+    button {
+      background: #fff;
+      border: 1px solid #e8d5df;
+      color: #987c8b;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button.active,
+    button:hover {
+      background: #f5e8ef;
+      border-color: #d7b8c8;
+    }
+
+    .album {
+      max-width: 430px;
+      margin: auto;
+      padding: 18px;
+      background: white;
+      border: 1px solid #eadce3;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px #e9dce355;
+    }
+
+    .album-title {
+      font-size: 20px;
+      margin: 5px 0 15px;
+    }
+
+    .photo-frame {
+      background: #faf4f7;
+      border: 1px solid #eadce3;
+      padding: 10px;
+      min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #photo {
+      display: block;
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      cursor: zoom-in;
+    }
+
+    #error {
+      display: none;
+      padding: 30px 12px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .page-number {
+      font-size: 13px;
+      margin: 15px 0;
+      color: #b69aa8;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .decoration {
+      color: #d7b8c8;
+      margin-top: 20px;
+      letter-spacing: 5px;
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #241a20ee;
+      z-index: 10;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      cursor: zoom-out;
+    }
+
+    .lightbox img {
+      max-width: 95%;
+      max-height: 90vh;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="pearls">♡ · · · ♡ · · · ♡</div>
+
+  <h1>illit photo album</h1>
+  <div class="subtitle">a little collection of precious moments</div>
+
+  <div class="member-buttons" id="memberButtons"></div>
+
+  <div class="album">
+    <div class="album-title" id="albumTitle">yunah ♡</div>
+
+    <div class="photo-frame">
+      <img id="photo" src="" alt="album photo">
+      <div id="error">
+        couldn't find this photo ♡<br>
+        check that the folder and filename match:<br>
+        <strong id="filename"></strong>
+      </div>
+    </div>
+
+    <div class="page-number" id="pageNumber">page 1 of 5</div>
+
+    <div class="navigation">
+      <button onclick="changePage(-1)">♡ previous</button>
+      <button onclick="changePage(1)">next ♡</button>
+    </div>
+  </div>
+
+  <div class="decoration">୨୧ · · · ୨୧ · · · ୨୧</div>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="largePhoto" src="" alt="enlarged album photo">
+  </div>
+
+  <script>
+    const members = [
+      "yunah",
+      "minju",
+      "wonhee",
+      "moka",
+      "iroha",
+      "illit"
+    ];
+
+    let currentMember = "yunah";
+    let currentPage = 1;
+    const totalPages = 5;
+
+    const photo = document.getElementById("photo");
+    const error = document.getElementById("error");
+
+    function photoPath(member, page) {
+      return `${member}/${encodeURIComponent(member + " " + page + ".JPG")}`;
+    }
+
+    function showPhoto() {
+      const path = photoPath(currentMember, currentPage);
+
+      photo.style.display = "block";
+      error.style.display = "none";
+
+      photo.onload = function() {
+        photo.style.display = "block";
+        error.style.display = "none";
+      };
+
+      photo.onerror = function() {
+        photo.style.display = "none";
+        error.style.display = "block";
+        document.getElementById("filename").textContent =
+          currentMember + "/" + currentMember + " " + currentPage + ".JPG";
+      };
+
+      photo.src = path;
+
+      document.getElementById("albumTitle").textContent =
+        currentMember + " ♡";
+
+      document.getElementById("pageNumber").textContent =
+        "page " + currentPage + " of " + totalPages;
+    }
+
+    function selectMember(member) {
+      currentMember = member;
+      currentPage = 1;
+      updateButtons();
+      showPhoto();
+    }
+
+    function changePage(direction) {
+      currentPage += direction;
+
+      if (currentPage > totalPages) {
+        currentPage = 1;
+      }
+
+      if (currentPage < 1) {
+        currentPage = totalPages;
+      }
+
+      showPhoto();
+    }
+
+    function updateButtons() {
+      const container = document.getElementById("memberButtons");
+      container.innerHTML = "";
+
+      members.forEach(function(member) {
+        const button = document.createElement("button");
+
+        button.textContent = member === "illit"
+          ? "group ♡"
+          : member + " ♡";
+
+        if (member === currentMember) {
+          button.classList.add("active");
+        }
+
+        button.onclick = function() {
+          selectMember(member);
+        };
+
+        container.appendChild(button);
+      });
+    }
+
+    photo.onclick = function() {
+      if (photo.style.display !== "none" && photo.src) {
+        document.getElementById("largePhoto").src = photo.src;
+        document.getElementById("lightbox").style.display = "flex";
+      }
+    };
+
+    function closeLightbox() {
+      document.getElementById("lightbox").style.display = "none";
+    }
+
+    updateButtons();
+    showPhoto();
+  </script>
+
+</body>
+</html>
